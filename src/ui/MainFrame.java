@@ -9,5 +9,11 @@ public class MainFrame extends JFrame {
     }
 
     private void initialize() {
+        setTitle("Student Management System");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        setContentPane(new StudentForm());
     }
 }
