@@ -1,0 +1,81 @@
+Main actor:
+- System Administrator
+
+Core Actions:
+* Student management
+    - Add student
+    - Update student
+    - Delete student
+    - View student list
+
+* Course management
+    - Add course
+    - Update course
+    - Delete course
+    - View course list
+
+* Enrollment management
+    - Enroll student to course
+    - View enrolled courses per student
+    - Remove enrollment
+
+Main classes:
+- Person: Base class.
+
+* Fields
+- id
+- firstName
+- lastName
+- email
+
+>> Purpose: Demonstrates inheritance and abstraction
+
+Course
+
+Fields
+
+courseCode
+
+courseName
+
+units
+
+Purpose
+
+Independent model
+
+Used in enrollment association
+
+Enrollment
+
+Fields
+
+student
+
+course
+
+semester
+
+schoolYear
+
+Purpose
+
+Association between Student and Course
+
+Composition concept in explanation
+
+UserAccount
+
+Fields
+
+username
+
+password
+
+role
+
+Purpose
+
+Completes the minimum 5 classes
+
+Used for system access simulation
