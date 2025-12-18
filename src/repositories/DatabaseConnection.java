@@ -1,4 +1,4 @@
-package app.repositories;
+package src.repositories;
 
 import java.sql.Connection;
 

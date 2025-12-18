@@ -1,6 +1,6 @@
-package app.services;
+package src.services;
 
-import app.models.Course;
+import src.models.Course;
 
 public class CourseService {
 

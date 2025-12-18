@@ -1,7 +1,8 @@
-package app.repositories;
+package src.repositories;
 
-import app.models.Enrollment;
 import java.util.List;
+
+import src.models.Enrollment;
 
 public class EnrollmentRepository {
 

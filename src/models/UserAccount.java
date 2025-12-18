@@ -1,4 +1,4 @@
-package app.models;
+package src.models;
 
 public class UserAccount {
 

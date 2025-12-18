@@ -1,7 +1,8 @@
-package app.repositories;
+package src.repositories;
 
-import app.models.Course;
 import java.util.List;
+
+import src.models.Course;
 
 public class CourseRepository {
 

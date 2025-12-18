@@ -1,7 +1,8 @@
-package app.repositories;
+package src.repositories;
 
-import app.models.Student;
 import java.util.List;
+
+import src.models.Student;
 
 public class StudentRepository {
 
