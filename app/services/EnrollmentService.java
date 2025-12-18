@@ -1,6 +1,6 @@
-package services;
+package app.services;
 
-import models.Enrollment;
+import app.models.Enrollment;
 
 public class EnrollmentService {
 
