@@ -1,7 +1,16 @@
+=========================
+
+Project Title: E-skwela: Simple Java Student Management System
+
+=========================
+
 Main actor:
 - System Administrator
 
+=========================
+
 Core Actions:
+
 * Student management
     - Add student
     - Update student
@@ -19,63 +28,67 @@ Core Actions:
     - View enrolled courses per student
     - Remove enrollment
 
+=========================
+
 Main classes:
-- Person: Base class.
+
+---------------------
+
+Person:
+- Base class.
 
 * Fields
-- id
-- firstName
-- lastName
-- email
+    - id
+    - firstName
+    - lastName
+    - email
 
->> Purpose: Demonstrates inheritance and abstraction
+>> Purpose:
+    Demonstrates inheritance and abstraction
 
-Course
+---------------------
 
-Fields
+Course:
 
-courseCode
+* Fields
+    - courseCode
+    - courseName
+    - units
 
-courseName
+>> Purpose:
+    - Independent model
+    - Used in enrollment association
 
-units
-
-Purpose
-
-Independent model
-
-Used in enrollment association
+---------------------
 
 Enrollment
 
-Fields
+* Fields
+    - student
+    - course
+    - semester
+    - schoolYear
 
-student
+>> Purpose
+    - Association between Student and Course
+    - Composition concept in explanation
 
-course
-
-semester
-
-schoolYear
-
-Purpose
-
-Association between Student and Course
-
-Composition concept in explanation
+---------------------
 
 UserAccount
 
-Fields
+* Fields
+    - username
+    - password
+    - role
 
-username
+>> Purpose
+    - Completes the minimum 5 classes
+    - Used for system access simulation
 
-password
+=========================
 
-role
-
-Purpose
-
-Completes the minimum 5 classes
-
-Used for system access simulation
+Relationships:
+    - One student can have many enrollments
+    - One course can have many enrollments
+    - Enrollment links student and course
