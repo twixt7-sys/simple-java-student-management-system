@@ -1,6 +1,6 @@
-package app.services;
+package src.services;
 
-import app.models.Student;
+import src.models.Student;
 
 public class StudentService {
 
