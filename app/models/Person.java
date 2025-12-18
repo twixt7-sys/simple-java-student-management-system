@@ -7,7 +7,8 @@ public abstract class Person {
     protected String lastName;
     protected String email;
 
-    public Person() {}
+    public Person() {
+    }
 
     public Person(int id, String firstName, String lastName, String email) {
         this.id = id;
