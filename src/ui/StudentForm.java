@@ -74,7 +74,7 @@ public class StudentForm extends JPanel {
         JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        JButton btnSave = new JButton("Save Student");
+        JButton btnSave = new JButton("Save");
         btnSave.addActionListener(e -> saveStudent());
         buttonPanel.add(btnSave);
 

@@ -5,8 +5,11 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
 
-    private CardLayout cardLayout;
+    private CardLayout mainLayout;
+    private CardLayout formsLayout;
+
     private JPanel contentPanel;
+    private JPanel formsPanel;
 
     public MainFrame() {
         initialize();
@@ -18,36 +21,80 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        cardLayout = new CardLayout();
-        contentPanel = new JPanel(cardLayout);
+        // main card layout (LOGIN / SYSTEM)
+        mainLayout = new CardLayout();
+        contentPanel = new JPanel(mainLayout);
 
+        // ---------- FORMS ----------
         StudentForm studentForm = new StudentForm();
         CourseForm courseForm = new CourseForm();
         EnrollmentForm enrollmentForm = new EnrollmentForm();
 
-        contentPanel.add(studentForm, "STUDENT");
-        contentPanel.add(courseForm, "COURSE");
-        contentPanel.add(enrollmentForm, "ENROLLMENT");
+        formsLayout = new CardLayout();
+        formsPanel = new JPanel(formsLayout);
+        formsPanel.add(studentForm, "STUDENT");
+        formsPanel.add(courseForm, "COURSE");
+        formsPanel.add(enrollmentForm, "ENROLLMENT");
 
+        // ---------- MENU ----------
         JPanel menuPanel = new JPanel(new FlowLayout());
 
         JButton btnStudents = new JButton("Students");
         btnStudents.addActionListener(e
-                -> cardLayout.show(contentPanel, "STUDENT"));
+                -> formsLayout.show(formsPanel, "STUDENT"));
 
         JButton btnCourses = new JButton("Courses");
         btnCourses.addActionListener(e
-                -> cardLayout.show(contentPanel, "COURSE"));
+                -> formsLayout.show(formsPanel, "COURSE"));
 
         JButton btnEnrollments = new JButton("Enrollments");
         btnEnrollments.addActionListener(e
-                -> cardLayout.show(contentPanel, "ENROLLMENT"));
+                -> formsLayout.show(formsPanel, "ENROLLMENT"));
+
+        JButton btnLogout = new JButton("Logout");
+        btnLogout.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to logout?",
+                    "Confirm Logout",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                logout();
+            }
+        });
 
         menuPanel.add(btnStudents);
         menuPanel.add(btnCourses);
         menuPanel.add(btnEnrollments);
+        menuPanel.add(btnLogout);
 
-        add(menuPanel, BorderLayout.NORTH);
-        add(contentPanel, BorderLayout.CENTER);
+        // ---------- SYSTEM PANEL ----------
+        JPanel systemPanel = new JPanel(new BorderLayout());
+        systemPanel.add(menuPanel, BorderLayout.NORTH);
+        systemPanel.add(formsPanel, BorderLayout.CENTER);
+
+        // ---------- LOGIN ----------
+        LoginForm loginForm = new LoginForm(this);
+
+        contentPanel.add(loginForm, "LOGIN");
+        contentPanel.add(systemPanel, "SYSTEM");
+
+        add(contentPanel);
+
+        // start at login
+        mainLayout.show(contentPanel, "LOGIN");
+    }
+
+    // called after successful login
+    public void showMainSystem() {
+        mainLayout.show(contentPanel, "SYSTEM");
+        formsLayout.show(formsPanel, "STUDENT");
+    }
+
+    // logout action
+    public void logout() {
+        mainLayout.show(contentPanel, "LOGIN");
     }
 }
