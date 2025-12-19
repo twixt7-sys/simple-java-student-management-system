@@ -1,11 +1,10 @@
 package src.ui;
 
+import java.awt.*;
+import javax.swing.*;
+import src.exceptions.InvalidInputException;
 import src.models.UserAccount;
 import src.services.UserAccountService;
-import src.exceptions.InvalidInputException;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class LoginForm extends JPanel {
 

@@ -1,13 +1,12 @@
 package src.ui;
 
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import src.exceptions.InvalidInputException;
 import src.models.Student;
 import src.services.StudentService;
-import src.exceptions.InvalidInputException;
-import javax.swing.table.DefaultTableModel;
-import java.util.List;
-
-import javax.swing.*;
-import java.awt.*;
 
 // Swing form for adding and managing student records.
 public class StudentForm extends JPanel {
@@ -179,7 +178,7 @@ public class StudentForm extends JPanel {
             clearFields();
 
             JOptionPane.showMessageDialog(this, "Student updated");
-
+            loadStudents();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
@@ -204,6 +203,8 @@ public class StudentForm extends JPanel {
             clearFields();
             JOptionPane.showMessageDialog(this, "Student deleted");
         }
+
+        loadStudents();
     }
 
     private void clearFields() {
