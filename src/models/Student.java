@@ -1,5 +1,7 @@
 package src.models;
 
+// Represents a student entity in the system.
+// Inherits common attributes from Person.
 public class Student extends Person {
 
     private String studentNumber;

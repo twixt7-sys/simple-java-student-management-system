@@ -8,6 +8,8 @@ import java.util.List;
 
 import src.models.Student;
 
+// Handles all database operations related to students.
+// Uses JDBC for CRUD operations.
 public class StudentRepository {
 
     public void addStudent(Student student) {

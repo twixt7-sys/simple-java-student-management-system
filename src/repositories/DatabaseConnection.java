@@ -12,15 +12,17 @@ public class DatabaseConnection {
 
     public static Connection getConnection() {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
             Properties props = new Properties();
             InputStream input = DatabaseConnection.class.getResourceAsStream(CONFIG_FILE);
             props.load(input);
 
-            String url = props.getProperty("db.url");
-            String username = props.getProperty("db.username");
-            String password = props.getProperty("db.password");
-
-            return DriverManager.getConnection(url, username, password);
+            return DriverManager.getConnection(
+                    props.getProperty("db.url"),
+                    props.getProperty("db.username"),
+                    props.getProperty("db.password")
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
