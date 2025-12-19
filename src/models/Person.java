@@ -17,6 +17,14 @@ public abstract class Person {
         this.email = email;
     }
 
+    // for debugging
+    public void printInfo() {
+        System.out.println("Person Info");
+        System.out.println("ID: " + id);
+        System.out.println("Name: " + firstName + " " + lastName);
+        System.out.println("Email: " + email);
+    }
+
     public int getId() {
         return id;
     }

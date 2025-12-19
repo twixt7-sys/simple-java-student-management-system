@@ -17,6 +17,17 @@ public class Student extends Person {
         this.program = program;
     }
 
+    // polymorphism
+    @Override
+    public void printInfo() {
+        // reuse base info
+        super.printInfo();
+
+        // student specific info
+        System.out.println("Student Number: " + studentNumber);
+        System.out.println("Program: " + program);
+    }
+
     public String getStudentNumber() {
         return studentNumber;
     }
