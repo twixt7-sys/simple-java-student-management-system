@@ -1,13 +1,12 @@
 package src.ui;
 
-import src.models.Course;
-import src.services.CourseService;
-import src.exceptions.InvalidInputException;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import src.exceptions.InvalidInputException;
+import src.models.Course;
+import src.services.CourseService;
 
 // Swing form for adding and managing course records.
 public class CourseForm extends JPanel {
@@ -166,6 +165,7 @@ public class CourseForm extends JPanel {
             clearFields();
             JOptionPane.showMessageDialog(this, "Course deleted");
         }
+        loadCourses();
     }
 
     private void clearFields() {
