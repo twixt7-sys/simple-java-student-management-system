@@ -5,6 +5,7 @@ public class Enrollment {
     private int id;
     private Student student;
     private Course course;
+    private String grade;
     private String semester;
     private String schoolYear;
 
@@ -12,10 +13,11 @@ public class Enrollment {
     }
 
     public Enrollment(int id, Student student, Course course,
-            String semester, String schoolYear) {
+            String grade, String semester, String schoolYear) {
         this.id = id;
         this.student = student;
         this.course = course;
+        this.grade = grade;
         this.semester = semester;
         this.schoolYear = schoolYear;
     }
@@ -42,6 +44,14 @@ public class Enrollment {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
     }
 
     public String getSemester() {

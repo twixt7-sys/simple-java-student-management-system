@@ -3,6 +3,7 @@ package src.ui;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -10,9 +11,9 @@ import javax.swing.table.JTableHeader;
 import src.exceptions.InvalidInputException;
 import src.models.Course;
 import src.services.CourseService;
-import src.ui.components.FormCard;
+import src.ui.components.RoundedButton;
+import src.ui.components.RoundedTextField;
 import src.ui.components.Theme;
-import src.ui.components.UIEffects;
 
 public class CourseForm extends JPanel {
 
@@ -20,81 +21,131 @@ public class CourseForm extends JPanel {
     private DefaultTableModel tableModel;
     private int selectedCourseId = -1;
 
-    private JTextField txtCourseCode;
-    private JTextField txtCourseName;
-    private JTextField txtUnits;
+    private RoundedTextField txtCourseCode;
+    private RoundedTextField txtCourseName;
+    private RoundedTextField txtUnits;
+    private JLabel statusLabel;
 
     private final CourseService courseService;
 
     public CourseForm() {
         courseService = new CourseService();
-        setLayout(new BorderLayout(16, 16));
+        setLayout(new BorderLayout(12, 12));
         setBackground(Theme.DARK_BG);
+        setBorder(new EmptyBorder(16, 16, 16, 16));
         initialize();
     }
 
     private void initialize() {
-        FormCard card = new FormCard();
-        card.setHeader("Courses");
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(Theme.DARK_SURFACE);
+        card.setBorder(new EmptyBorder(24, 24, 24, 24));
 
-        JPanel form = new JPanel(new GridLayout(3, 2, 10, 10));
-        form.setOpaque(false);
-        form.setBorder(new javax.swing.border.EmptyBorder(6, 6, 6, 6));
+        GridBagConstraints g = new GridBagConstraints();
+        g.insets = new Insets(10, 12, 10, 12);
+        g.fill = GridBagConstraints.HORIZONTAL;
 
+        // Header
+        JLabel header = new JLabel("Course Management");
+        header.setFont(new Font("Segoe UI", Font.BOLD, (int) 16f));
+        header.setForeground(Theme.ACCENT_BLUE);
+        g.gridx = 0;
+        g.gridy = 0;
+        g.gridwidth = 2;
+        card.add(header, g);
+        g.gridwidth = 1;
+        g.gridy++;
+
+        // Course Code
         JLabel lbl1 = new JLabel("Course Code");
         lbl1.setForeground(Theme.DARK_TEXT);
-        lbl1.setFont(lbl1.getFont().deriveFont(Font.BOLD, 11f));
-        form.add(lbl1);
-        txtCourseCode = new JTextField();
-        txtCourseCode.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtCourseCode);
-        form.add(txtCourseCode);
+        lbl1.setFont(new Font("Segoe UI", Font.BOLD, (int) 11f));
+        g.gridx = 0;
+        card.add(lbl1, g);
+        g.gridx = 1;
+        txtCourseCode = new RoundedTextField();
+        txtCourseCode.setPreferredSize(new Dimension(200, 38));
+        card.add(txtCourseCode, g);
 
+        // Course Name
+        g.gridx = 0;
+        g.gridy++;
         JLabel lbl2 = new JLabel("Course Name");
         lbl2.setForeground(Theme.DARK_TEXT);
-        lbl2.setFont(lbl2.getFont().deriveFont(Font.BOLD, 11f));
-        form.add(lbl2);
-        txtCourseName = new JTextField();
-        txtCourseName.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtCourseName);
-        form.add(txtCourseName);
+        lbl2.setFont(new Font("Segoe UI", Font.BOLD, (int) 11f));
+        card.add(lbl2, g);
+        g.gridx = 1;
+        txtCourseName = new RoundedTextField();
+        txtCourseName.setPreferredSize(new Dimension(200, 38));
+        card.add(txtCourseName, g);
 
-        JLabel lbl3 = new JLabel("Units");
+        // Units
+        g.gridx = 0;
+        g.gridy++;
+        JLabel lbl3 = new JLabel("Credits");
         lbl3.setForeground(Theme.DARK_TEXT);
-        lbl3.setFont(lbl3.getFont().deriveFont(Font.BOLD, 11f));
-        form.add(lbl3);
-        txtUnits = new JTextField();
-        txtUnits.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtUnits);
-        form.add(txtUnits);
+        lbl3.setFont(new Font("Segoe UI", Font.BOLD, (int) 11f));
+        card.add(lbl3, g);
+        g.gridx = 1;
+        txtUnits = new RoundedTextField();
+        txtUnits.setPreferredSize(new Dimension(200, 38));
+        card.add(txtUnits, g);
+
+        // Status label
+        g.gridx = 0;
+        g.gridy++;
+        g.gridwidth = 2;
+        statusLabel = new JLabel("");
+        statusLabel.setForeground(Theme.SUCCESS_GREEN);
+        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, (int) 10f));
+        card.add(statusLabel, g);
+        g.gridwidth = 1;
+        g.gridy++;
+
+        // Buttons
+        g.gridx = 0;
+        g.gridwidth = 2;
+        g.anchor = GridBagConstraints.EAST;
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setOpaque(false);
 
-        JButton btnSave = new JButton("Save");
-        JButton btnUpdate = new JButton("Update");
-        JButton btnDelete = new JButton("Delete");
+        RoundedButton btnClear = new RoundedButton("Clear", Theme.DARK_SURFACE_LIGHT,
+                Theme.DARK_SURFACE, new Color(100, 100, 100));
+        RoundedButton btnDelete = new RoundedButton("Delete", Theme.ERROR_RED,
+                new Color(220, 100, 100), new Color(180, 50, 50));
+        RoundedButton btnUpdate = new RoundedButton("Update", Theme.ACCENT_BLUE_HOVER,
+                Theme.ACCENT_BLUE, Theme.ACCENT_BLUE_DARK);
+        RoundedButton btnSave = new RoundedButton("Add New", Theme.SUCCESS_GREEN,
+                new Color(80, 220, 120), new Color(30, 150, 60));
 
-        UIEffects.styleButton(btnSave);
-        UIEffects.styleButton(btnUpdate);
-        UIEffects.styleButton(btnDelete);
+        btnClear.setPreferredSize(new Dimension(100, 36));
+        btnDelete.setPreferredSize(new Dimension(100, 36));
+        btnUpdate.setPreferredSize(new Dimension(100, 36));
+        btnSave.setPreferredSize(new Dimension(100, 36));
 
         btnSave.addActionListener(e -> saveCourse());
         btnUpdate.addActionListener(e -> updateCourse());
         btnDelete.addActionListener(e -> deleteCourse());
+        btnClear.addActionListener(e -> clearFields());
 
-        actions.add(btnSave);
-        actions.add(btnUpdate);
+        actions.add(btnClear);
         actions.add(btnDelete);
+        actions.add(btnUpdate);
+        actions.add(btnSave);
 
-        card.add(form, BorderLayout.CENTER);
-        card.add(actions, BorderLayout.SOUTH);
+        card.add(actions, g);
 
         add(card, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Code", "Name", "Units"}, 0
-        );
+                new Object[]{"ID", "Code", "Name", "Credits"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         table = new JTable(tableModel);
         table.setRowHeight(32);
@@ -104,12 +155,14 @@ public class CourseForm extends JPanel {
         table.setForeground(Theme.DARK_TEXT);
         table.setSelectionBackground(Theme.ACCENT_BLUE);
         table.setSelectionForeground(Color.WHITE);
-        table.setGridColor(Theme.DARK_SURFACE_LIGHT);
+        table.setGridColor(new Color(50, 50, 50));
+        table.setIntercellSpacing(new Dimension(0, 0));
 
-        JTableHeader header = table.getTableHeader();
-        header.setBackground(Theme.DARK_SURFACE_LIGHT);
-        header.setForeground(Theme.DARK_TEXT);
-        header.setFont(header.getFont().deriveFont(Font.BOLD, 11f));
+        JTableHeader header2 = table.getTableHeader();
+        header2.setBackground(Theme.DARK_SURFACE_LIGHT);
+        header2.setForeground(Theme.DARK_TEXT);
+        header2.setFont(new Font("Segoe UI", Font.BOLD, (int) 12f));
+        header2.setPreferredSize(new Dimension(0, 36));
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBackground(Theme.DARK_BG);
@@ -125,6 +178,7 @@ public class CourseForm extends JPanel {
                 txtCourseCode.setText(tableModel.getValueAt(row, 1).toString());
                 txtCourseName.setText(tableModel.getValueAt(row, 2).toString());
                 txtUnits.setText(tableModel.getValueAt(row, 3).toString());
+                setStatus("Selected course #" + selectedCourseId, Theme.ACCENT_BLUE);
             }
         });
 
@@ -146,6 +200,10 @@ public class CourseForm extends JPanel {
     }
 
     private void saveCourse() {
+        if (!validateInputs()) {
+            return;
+        }
+
         try {
             Course course = new Course();
             course.setCourseCode(txtCourseCode.getText());
@@ -155,15 +213,22 @@ public class CourseForm extends JPanel {
             courseService.createCourse(course);
             loadCourses();
             clearFields();
+            setStatus("✓ Course added successfully!", Theme.SUCCESS_GREEN);
 
-            JOptionPane.showMessageDialog(this, "Course saved");
-        } catch (InvalidInputException | NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+        } catch (InvalidInputException ex) {
+            setStatus(ex.getMessage(), Theme.ERROR_RED);
+        } catch (NumberFormatException ex) {
+            setStatus("Credits must be a number", Theme.ERROR_RED);
         }
     }
 
     private void updateCourse() {
         if (selectedCourseId == -1) {
+            setStatus("Select a course first", Theme.ERROR_RED);
+            return;
+        }
+
+        if (!validateInputs()) {
             return;
         }
 
@@ -177,19 +242,34 @@ public class CourseForm extends JPanel {
             courseService.updateCourse(course);
             loadCourses();
             clearFields();
+            setStatus("✓ Course updated!", Theme.SUCCESS_GREEN);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            setStatus(ex.getMessage(), Theme.ERROR_RED);
         }
     }
 
     private void deleteCourse() {
         if (selectedCourseId == -1) {
+            setStatus("Select a course first", Theme.ERROR_RED);
             return;
         }
 
-        courseService.deleteCourse(selectedCourseId);
-        loadCourses();
-        clearFields();
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Delete this course?\nThis cannot be undone.",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                courseService.deleteCourse(selectedCourseId);
+                loadCourses();
+                clearFields();
+                setStatus("✓ Course deleted", Theme.SUCCESS_GREEN);
+            } catch (Exception ex) {
+                setStatus("Failed to delete: " + ex.getMessage(), Theme.ERROR_RED);
+            }
+        }
     }
 
     private void clearFields() {
@@ -197,5 +277,28 @@ public class CourseForm extends JPanel {
         txtCourseName.setText("");
         txtUnits.setText("");
         selectedCourseId = -1;
+        statusLabel.setText("");
+        table.clearSelection();
+    }
+
+    private boolean validateInputs() {
+        if (txtCourseCode.getText().trim().isEmpty()) {
+            setStatus("Course code is required", Theme.ERROR_RED);
+            return false;
+        }
+        if (txtCourseName.getText().trim().isEmpty()) {
+            setStatus("Course name is required", Theme.ERROR_RED);
+            return false;
+        }
+        if (txtUnits.getText().trim().isEmpty()) {
+            setStatus("Credits are required", Theme.ERROR_RED);
+            return false;
+        }
+        return true;
+    }
+
+    private void setStatus(String message, Color color) {
+        statusLabel.setText(message);
+        statusLabel.setForeground(color);
     }
 }

@@ -6,10 +6,10 @@ import src.exceptions.InvalidInputException;
 import src.models.Course;
 import src.services.EnrollmentService;
 import src.ui.components.Theme;
-import src.ui.components.UIEffects;
+import src.ui.components.RoundedButton;
+import src.ui.components.RoundedTextField;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
@@ -17,93 +17,141 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
-// Swing form for managing student enrollments.
 public class EnrollmentForm extends JPanel {
 
     private JTable table;
     private DefaultTableModel tableModel;
     private int selectedEnrollmentId = -1;
 
-    private JTextField txtStudentId;
-    private JTextField txtCourseId;
-    private JTextField txtSemester;
-    private JTextField txtSchoolYear;
+    private RoundedTextField txtStudentId;
+    private RoundedTextField txtCourseId;
+    private RoundedTextField txtGrade;
+    private JLabel statusLabel;
 
     private final EnrollmentService enrollmentService;
 
     public EnrollmentForm() {
         enrollmentService = new EnrollmentService();
         setBackground(Theme.DARK_BG);
+        setLayout(new BorderLayout(12, 12));
+        setBorder(new EmptyBorder(16, 16, 16, 16));
         initialize();
         loadEnrollments();
     }
 
     private void initialize() {
-        setLayout(new BorderLayout(16, 16));
-        setBorder(new EmptyBorder(20, 20, 20, 20));
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(Theme.DARK_SURFACE);
+        card.setBorder(new EmptyBorder(24, 24, 24, 24));
 
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 12, 12));
-        formPanel.setBackground(Theme.DARK_SURFACE);
-        formPanel.setBorder(new CompoundBorder(
-                new LineBorder(Theme.DARK_SURFACE_LIGHT, 1),
-                new EmptyBorder(16, 16, 16, 16)
-        ));
+        GridBagConstraints g = new GridBagConstraints();
+        g.insets = new Insets(10, 12, 10, 12);
+        g.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel lbl1 = new JLabel("Student ID:");
+        JLabel header = new JLabel("Enrollment Management");
+        header.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        header.setForeground(Theme.ACCENT_BLUE);
+        g.gridx = 0;
+        g.gridy = 0;
+        g.gridwidth = 2;
+        card.add(header, g);
+
+        g.gridwidth = 1;
+        g.gridy++;
+
+        JLabel lbl1 = new JLabel("Student ID");
         lbl1.setForeground(Theme.DARK_TEXT);
-        lbl1.setFont(lbl1.getFont().deriveFont(Font.BOLD, 11f));
-        formPanel.add(lbl1);
-        txtStudentId = new JTextField();
-        txtStudentId.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtStudentId);
-        formPanel.add(txtStudentId);
+        lbl1.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        g.gridx = 0;
+        card.add(lbl1, g);
 
-        JLabel lbl2 = new JLabel("Course ID:");
+        g.gridx = 1;
+        txtStudentId = new RoundedTextField();
+        txtStudentId.setPreferredSize(new Dimension(200, 38));
+        card.add(txtStudentId, g);
+
+        g.gridx = 0;
+        g.gridy++;
+        JLabel lbl2 = new JLabel("Course ID");
         lbl2.setForeground(Theme.DARK_TEXT);
-        lbl2.setFont(lbl2.getFont().deriveFont(Font.BOLD, 11f));
-        formPanel.add(lbl2);
-        txtCourseId = new JTextField();
-        txtCourseId.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtCourseId);
-        formPanel.add(txtCourseId);
+        lbl2.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        card.add(lbl2, g);
 
-        JLabel lbl3 = new JLabel("Semester:");
+        g.gridx = 1;
+        txtCourseId = new RoundedTextField();
+        txtCourseId.setPreferredSize(new Dimension(200, 38));
+        card.add(txtCourseId, g);
+
+        g.gridx = 0;
+        g.gridy++;
+        JLabel lbl3 = new JLabel("Grade (optional)");
         lbl3.setForeground(Theme.DARK_TEXT);
-        lbl3.setFont(lbl3.getFont().deriveFont(Font.BOLD, 11f));
-        formPanel.add(lbl3);
-        txtSemester = new JTextField();
-        txtSemester.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtSemester);
-        formPanel.add(txtSemester);
+        lbl3.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        card.add(lbl3, g);
 
-        JLabel lbl4 = new JLabel("School Year:");
-        lbl4.setForeground(Theme.DARK_TEXT);
-        lbl4.setFont(lbl4.getFont().deriveFont(Font.BOLD, 11f));
-        formPanel.add(lbl4);
-        txtSchoolYear = new JTextField();
-        txtSchoolYear.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
-        UIEffects.styleTextField(txtSchoolYear);
-        formPanel.add(txtSchoolYear);
+        g.gridx = 1;
+        txtGrade = new RoundedTextField();
+        txtGrade.setPreferredSize(new Dimension(200, 38));
+        card.add(txtGrade, g);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        buttonPanel.setOpaque(false);
+        g.gridx = 0;
+        g.gridy++;
+        g.gridwidth = 2;
+        statusLabel = new JLabel("");
+        statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        card.add(statusLabel, g);
 
-        JButton btnEnroll = new JButton("Enroll");
-        UIEffects.styleButton(btnEnroll);
-        btnEnroll.addActionListener(e -> enrollStudent());
-        buttonPanel.add(btnEnroll);
+        g.gridy++;
+        g.anchor = GridBagConstraints.EAST;
 
-        JButton btnDelete = new JButton("Delete");
-        UIEffects.styleButton(btnDelete);
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        actions.setOpaque(false);
+
+        RoundedButton btnClear = new RoundedButton(
+                "Clear",
+                Theme.DARK_SURFACE_LIGHT,
+                Theme.DARK_SURFACE,
+                new Color(100, 100, 100)
+        );
+
+        RoundedButton btnDelete = new RoundedButton(
+                "Remove",
+                Theme.ERROR_RED,
+                new Color(220, 100, 100),
+                new Color(180, 50, 50)
+        );
+
+        RoundedButton btnEnroll = new RoundedButton(
+                "Enroll",
+                Theme.SUCCESS_GREEN,
+                new Color(80, 220, 120),
+                new Color(30, 150, 60)
+        );
+
+        btnClear.setPreferredSize(new Dimension(100, 36));
+        btnDelete.setPreferredSize(new Dimension(100, 36));
+        btnEnroll.setPreferredSize(new Dimension(100, 36));
+
+        btnClear.addActionListener(e -> clearFields());
         btnDelete.addActionListener(e -> deleteEnrollment());
-        buttonPanel.add(btnDelete);
+        btnEnroll.addActionListener(e -> enrollStudent());
 
-        add(formPanel, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.SOUTH);
+        actions.add(btnClear);
+        actions.add(btnDelete);
+        actions.add(btnEnroll);
+
+        card.add(actions, g);
+        add(card, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Student ID", "Course ID", "Semester", "Year"}, 0
-        );
+                new Object[]{"ID", "Student ID", "Course ID", "Grade"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
         table = new JTable(tableModel);
         table.setRowHeight(32);
         table.setShowGrid(false);
@@ -112,30 +160,28 @@ public class EnrollmentForm extends JPanel {
         table.setForeground(Theme.DARK_TEXT);
         table.setSelectionBackground(Theme.ACCENT_BLUE);
         table.setSelectionForeground(Color.WHITE);
-        table.setGridColor(Theme.DARK_SURFACE_LIGHT);
 
-        JTableHeader header = table.getTableHeader();
-        header.setBackground(Theme.DARK_SURFACE_LIGHT);
-        header.setForeground(Theme.DARK_TEXT);
-        header.setFont(header.getFont().deriveFont(Font.BOLD, 11f));
+        JTableHeader th = table.getTableHeader();
+        th.setBackground(Theme.DARK_SURFACE_LIGHT);
+        th.setForeground(Theme.DARK_TEXT);
+        th.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        th.setPreferredSize(new Dimension(0, 36));
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBackground(Theme.DARK_BG);
-        scrollPane.getViewport().setBackground(Theme.DARK_SURFACE);
-        scrollPane.setBorder(new LineBorder(Theme.DARK_SURFACE_LIGHT, 1));
-
+        scrollPane.setBorder(new LineBorder(Theme.DARK_SURFACE_LIGHT));
         add(scrollPane, BorderLayout.CENTER);
 
         table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
+            if (!e.getValueIsAdjusting() && table.getSelectedRow() >= 0) {
                 int row = table.getSelectedRow();
-                if (row >= 0) {
-                    selectedEnrollmentId = (int) tableModel.getValueAt(row, 0);
-                    txtStudentId.setText(tableModel.getValueAt(row, 1).toString());
-                    txtCourseId.setText(tableModel.getValueAt(row, 2).toString());
-                    txtSemester.setText(tableModel.getValueAt(row, 3).toString());
-                    txtSchoolYear.setText(tableModel.getValueAt(row, 4).toString());
-                }
+                selectedEnrollmentId = (int) tableModel.getValueAt(row, 0);
+                txtStudentId.setText(tableModel.getValueAt(row, 1).toString());
+                txtCourseId.setText(tableModel.getValueAt(row, 2).toString());
+                txtGrade.setText(
+                        tableModel.getValueAt(row, 3).toString().equals("-") ? ""
+                        : tableModel.getValueAt(row, 3).toString()
+                );
+                setStatus("Selected enrollment #" + selectedEnrollmentId, Theme.ACCENT_BLUE);
             }
         });
     }
@@ -149,13 +195,16 @@ public class EnrollmentForm extends JPanel {
                 e.getId(),
                 e.getStudent().getId(),
                 e.getCourse().getId(),
-                e.getSemester(),
-                e.getSchoolYear()
+                e.getGrade() != null ? e.getGrade() : "-"
             });
         }
     }
 
     private void enrollStudent() {
+        if (!validateInputs()) {
+            return;
+        }
+
         try {
             Student student = new Student();
             student.setId(Integer.parseInt(txtStudentId.getText()));
@@ -166,42 +215,65 @@ public class EnrollmentForm extends JPanel {
             Enrollment enrollment = new Enrollment();
             enrollment.setStudent(student);
             enrollment.setCourse(course);
-            enrollment.setSemester(txtSemester.getText());
-            enrollment.setSchoolYear(txtSchoolYear.getText());
+            enrollment.setGrade(txtGrade.getText().isBlank() ? null : txtGrade.getText());
 
             enrollmentService.enrollStudent(enrollment);
 
-            JOptionPane.showMessageDialog(this, "Enrollment successful");
-
             loadEnrollments();
             clearFields();
+            setStatus("Enrollment successful", Theme.SUCCESS_GREEN);
 
         } catch (InvalidInputException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "Validation Error", JOptionPane.ERROR_MESSAGE);
+            setStatus(ex.getMessage(), Theme.ERROR_RED);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            setStatus("Enrollment failed: " + ex.getMessage(), Theme.ERROR_RED);
         }
     }
 
     private void deleteEnrollment() {
         if (selectedEnrollmentId == -1) {
-            JOptionPane.showMessageDialog(this, "Select an enrollment first");
+            setStatus("Select an enrollment first", Theme.ERROR_RED);
             return;
         }
 
-        enrollmentService.removeEnrollment(selectedEnrollmentId);
-        loadEnrollments();
-        clearFields();
-        JOptionPane.showMessageDialog(this, "Enrollment deleted");
-        loadEnrollments();
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Remove this enrollment?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            enrollmentService.removeEnrollment(selectedEnrollmentId);
+            loadEnrollments();
+            clearFields();
+            setStatus("Enrollment removed", Theme.SUCCESS_GREEN);
+        }
     }
 
     private void clearFields() {
         txtStudentId.setText("");
         txtCourseId.setText("");
-        txtSemester.setText("");
-        txtSchoolYear.setText("");
+        txtGrade.setText("");
         selectedEnrollmentId = -1;
+        statusLabel.setText("");
+        table.clearSelection();
+    }
+
+    private boolean validateInputs() {
+        if (txtStudentId.getText().isBlank()) {
+            setStatus("Student ID is required", Theme.ERROR_RED);
+            return false;
+        }
+        if (txtCourseId.getText().isBlank()) {
+            setStatus("Course ID is required", Theme.ERROR_RED);
+            return false;
+        }
+        return true;
+    }
+
+    private void setStatus(String message, Color color) {
+        statusLabel.setText(message);
+        statusLabel.setForeground(color);
     }
 }

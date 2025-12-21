@@ -3,12 +3,17 @@ import java.awt.Color;
 import java.awt.Font;
 import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
+
 import src.ui.MainFrame;
+import src.utils.DemoDataInitializer;
 
 public class Main {
 
     public static void main(String[] args) {
         applyGlobalStyle();
+
+        // Initialize demo data on startup
+        DemoDataInitializer.initializeDemoData();
 
         SwingUtilities.invokeLater(() -> {
             new MainFrame().setVisible(true);

@@ -2,20 +2,20 @@ package src.ui;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
 import src.exceptions.InvalidInputException;
 import src.models.UserAccount;
 import src.services.UserAccountService;
+import src.ui.components.RoundedButton;
+import src.ui.components.RoundedTextField;
 import src.ui.components.Theme;
-import src.ui.components.UIEffects;
 
 public class LoginForm extends JPanel {
 
-    private JTextField txtUsername;
+    private RoundedTextField txtUsername;
     private JPasswordField txtPassword;
+    private RoundedButton btnLogin;
 
     private final UserAccountService userService;
     private final MainFrame mainFrame;
@@ -33,82 +33,110 @@ public class LoginForm extends JPanel {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Theme.DARK_SURFACE);
-        card.setBorder(new CompoundBorder(
-                new LineBorder(Theme.DARK_SURFACE_LIGHT, 1),
-                new EmptyBorder(32, 36, 36, 36)
-        ));
-        card.setMaximumSize(new Dimension(380, 400));
-        card.setPreferredSize(new Dimension(380, 400));
+        card.setBorder(new EmptyBorder(40, 40, 40, 40));
+        card.setMaximumSize(new Dimension(420, 480));
+        card.setPreferredSize(new Dimension(420, 480));
 
+        // Title
         JLabel title = new JLabel("Welcome Back");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
+        title.setFont(new Font("Segoe UI", Font.BOLD, (int) 32f));
         title.setForeground(Theme.DARK_TEXT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Sign in to your account");
-        subtitle.setFont(subtitle.getFont().deriveFont(12f));
+        // Subtitle
+        JLabel subtitle = new JLabel("Student Management System");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, (int) 13f));
         subtitle.setForeground(Theme.DARK_TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Username section
         JLabel usernameLabel = new JLabel("Username");
         usernameLabel.setForeground(Theme.DARK_TEXT);
-        usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        usernameLabel.setFont(usernameLabel.getFont().deriveFont(Font.BOLD, 12f));
+        usernameLabel.setFont(new Font("Segoe UI", Font.BOLD, (int) 11f));
 
-        txtUsername = new JTextField();
-        txtUsername.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        txtUsername.setPreferredSize(new Dimension(Integer.MAX_VALUE, 40));
-        UIEffects.styleTextField(txtUsername);
+        txtUsername = new RoundedTextField();
+        txtUsername.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        txtUsername.setPreferredSize(new Dimension(Integer.MAX_VALUE, 45));
 
+        // Password section
         JLabel passwordLabel = new JLabel("Password");
         passwordLabel.setForeground(Theme.DARK_TEXT);
-        passwordLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        passwordLabel.setFont(passwordLabel.getFont().deriveFont(Font.BOLD, 12f));
+        passwordLabel.setFont(new Font("Segoe UI", Font.BOLD, (int) 11f));
 
         txtPassword = new JPasswordField();
-        txtPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        txtPassword.setPreferredSize(new Dimension(Integer.MAX_VALUE, 40));
-        UIEffects.styleTextField(txtPassword);
+        txtPassword.setBackground(Theme.DARK_SURFACE);
+        txtPassword.setForeground(Theme.DARK_TEXT);
+        txtPassword.setCaretColor(Theme.DARK_TEXT);
+        txtPassword.setPreferredSize(new Dimension(Integer.MAX_VALUE, 45));
+        txtPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, (int) 13f));
+        txtPassword.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
 
-        JButton btnLogin = new JButton("Sign In");
-        btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
-        btnLogin.setPreferredSize(new Dimension(Integer.MAX_VALUE, 44));
+        // Login button
+        btnLogin = new RoundedButton("Sign In", Theme.ACCENT_BLUE,
+                Theme.ACCENT_BLUE_HOVER, Theme.ACCENT_BLUE_DARK);
+        btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        btnLogin.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
         btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnLogin.setFont(btnLogin.getFont().deriveFont(Font.BOLD, 13f));
-        UIEffects.styleButton(btnLogin);
+        btnLogin.setFont(new Font("Segoe UI", Font.BOLD, (int) 14f));
         btnLogin.addActionListener(e -> login());
 
+        // Help text
+        JLabel helpText = new JLabel("Demo credentials: admin / admin123");
+        helpText.setForeground(Theme.DARK_TEXT_SECONDARY);
+        helpText.setFont(new Font("Segoe UI", Font.PLAIN, (int) 10f));
+        helpText.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Assembly
         card.add(title);
-        card.add(Box.createVerticalStrut(4));
+        card.add(Box.createVerticalStrut(8));
         card.add(subtitle);
-        card.add(Box.createVerticalStrut(28));
+        card.add(Box.createVerticalStrut(40));
         card.add(usernameLabel);
-        card.add(Box.createVerticalStrut(6));
+        card.add(Box.createVerticalStrut(8));
         card.add(txtUsername);
-        card.add(Box.createVerticalStrut(14));
+        card.add(Box.createVerticalStrut(18));
         card.add(passwordLabel);
-        card.add(Box.createVerticalStrut(6));
+        card.add(Box.createVerticalStrut(8));
         card.add(txtPassword);
-        card.add(Box.createVerticalStrut(24));
+        card.add(Box.createVerticalStrut(32));
         card.add(btnLogin);
+        card.add(Box.createVerticalStrut(20));
+        card.add(helpText);
 
         add(card);
     }
 
     private void login() {
-        try {
-            UserAccount user = userService.login(
-                    txtUsername.getText(),
-                    new String(txtPassword.getPassword())
-            );
+        String username = txtUsername.getText().trim();
+        String password = new String(txtPassword.getPassword());
 
-            JOptionPane.showMessageDialog(this, "Welcome " + user.getUsername());
+        if (username.isEmpty() || password.isEmpty()) {
+            showError("Please enter both username and password");
+            return;
+        }
+
+        try {
+            btnLogin.setEnabled(false);
+            btnLogin.setText("Signing in...");
+
+            UserAccount user = userService.login(username, password);
+
+            JOptionPane.showMessageDialog(this, "Welcome " + user.getUsername() + "! 🎓",
+                    "Login Successful", JOptionPane.INFORMATION_MESSAGE);
             mainFrame.showMainSystem();
 
         } catch (InvalidInputException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Login Error", JOptionPane.ERROR_MESSAGE);
+            showError(ex.getMessage());
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Unexpected error");
+            showError("Login failed. Please check your credentials.");
+        } finally {
+            btnLogin.setEnabled(true);
+            btnLogin.setText("Sign In");
         }
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
