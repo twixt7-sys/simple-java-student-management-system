@@ -1,7 +1,11 @@
 package src.ui;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+import src.ui.components.Theme;
+import src.ui.components.UIEffects;
 
 public class MainFrame extends JFrame {
 
@@ -12,88 +16,92 @@ public class MainFrame extends JFrame {
     private JPanel formsPanel;
 
     public MainFrame() {
+        Theme.dark();
         initialize();
     }
 
     private void initialize() {
         setTitle("Student Management System");
-        setSize(520, 360);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1200, 700);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setBackground(Theme.DARK_BG);
 
-        // main card layout (LOGIN / SYSTEM)
         mainLayout = new CardLayout();
         contentPanel = new JPanel(mainLayout);
-
-        // ---------- FORMS ----------
-        StudentForm studentForm = new StudentForm();
-        CourseForm courseForm = new CourseForm();
-        EnrollmentForm enrollmentForm = new EnrollmentForm();
+        contentPanel.setBackground(Theme.DARK_BG);
 
         formsLayout = new CardLayout();
         formsPanel = new JPanel(formsLayout);
-        formsPanel.add(studentForm, "STUDENT");
-        formsPanel.add(courseForm, "COURSE");
-        formsPanel.add(enrollmentForm, "ENROLLMENT");
+        formsPanel.setBackground(Theme.DARK_BG);
+        formsPanel.setBorder(new EmptyBorder(24, 28, 28, 28));
 
-        // ---------- MENU ----------
-        JPanel menuPanel = new JPanel(new FlowLayout());
+        formsPanel.add(new StudentForm(), "STUDENT");
+        formsPanel.add(new CourseForm(), "COURSE");
+        formsPanel.add(new EnrollmentForm(), "ENROLLMENT");
+
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setBackground(Theme.DARK_SURFACE);
+        topBar.setBorder(new EmptyBorder(14, 20, 14, 20));
+
+        JPanel nav = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
+        nav.setBackground(Theme.DARK_SURFACE);
+        nav.setOpaque(true);
 
         JButton btnStudents = new JButton("Students");
-        btnStudents.addActionListener(e
-                -> formsLayout.show(formsPanel, "STUDENT"));
+        btnStudents.addActionListener(e -> formsLayout.show(formsPanel, "STUDENT"));
+        UIEffects.styleButton(btnStudents);
 
         JButton btnCourses = new JButton("Courses");
-        btnCourses.addActionListener(e
-                -> formsLayout.show(formsPanel, "COURSE"));
+        btnCourses.addActionListener(e -> formsLayout.show(formsPanel, "COURSE"));
+        UIEffects.styleButton(btnCourses);
 
         JButton btnEnrollments = new JButton("Enrollments");
-        btnEnrollments.addActionListener(e
-                -> formsLayout.show(formsPanel, "ENROLLMENT"));
+        btnEnrollments.addActionListener(e -> formsLayout.show(formsPanel, "ENROLLMENT"));
+        UIEffects.styleButton(btnEnrollments);
+
+        nav.add(btnStudents);
+        nav.add(btnCourses);
+        nav.add(btnEnrollments);
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+        rightPanel.setBackground(Theme.DARK_SURFACE);
+        rightPanel.setOpaque(true);
+
+        JButton btnTheme = new JButton("🌙 Dark");
+        btnTheme.addActionListener(e -> {
+            Theme.dark();
+            SwingUtilities.updateComponentTreeUI(this);
+        });
+        UIEffects.styleButton(btnTheme);
 
         JButton btnLogout = new JButton("Logout");
-        btnLogout.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(
-                    this,
-                    "Are you sure you want to logout?",
-                    "Confirm Logout",
-                    JOptionPane.YES_NO_OPTION
-            );
+        btnLogout.addActionListener(e -> logout());
+        UIEffects.styleButton(btnLogout);
 
-            if (confirm == JOptionPane.YES_OPTION) {
-                logout();
-            }
-        });
+        rightPanel.add(btnTheme);
+        rightPanel.add(btnLogout);
 
-        menuPanel.add(btnStudents);
-        menuPanel.add(btnCourses);
-        menuPanel.add(btnEnrollments);
-        menuPanel.add(btnLogout);
+        topBar.add(nav, BorderLayout.WEST);
+        topBar.add(rightPanel, BorderLayout.EAST);
 
-        // ---------- SYSTEM PANEL ----------
         JPanel systemPanel = new JPanel(new BorderLayout());
-        systemPanel.add(menuPanel, BorderLayout.NORTH);
+        systemPanel.setBackground(Theme.DARK_BG);
+        systemPanel.add(topBar, BorderLayout.NORTH);
         systemPanel.add(formsPanel, BorderLayout.CENTER);
 
-        // ---------- LOGIN ----------
-        LoginForm loginForm = new LoginForm(this);
-
-        contentPanel.add(loginForm, "LOGIN");
+        contentPanel.add(new LoginForm(this), "LOGIN");
         contentPanel.add(systemPanel, "SYSTEM");
 
         add(contentPanel);
-
-        // start at login
         mainLayout.show(contentPanel, "LOGIN");
     }
 
-    // called after successful login
     public void showMainSystem() {
         mainLayout.show(contentPanel, "SYSTEM");
         formsLayout.show(formsPanel, "STUDENT");
     }
 
-    // logout action
     public void logout() {
         mainLayout.show(contentPanel, "LOGIN");
     }

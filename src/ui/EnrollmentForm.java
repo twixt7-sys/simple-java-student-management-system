@@ -5,9 +5,15 @@ import src.models.Student;
 import src.exceptions.InvalidInputException;
 import src.models.Course;
 import src.services.EnrollmentService;
+import src.ui.components.Theme;
+import src.ui.components.UIEffects;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.List;
 
@@ -27,39 +33,68 @@ public class EnrollmentForm extends JPanel {
 
     public EnrollmentForm() {
         enrollmentService = new EnrollmentService();
+        setBackground(Theme.DARK_BG);
         initialize();
         loadEnrollments();
     }
 
     private void initialize() {
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(16, 16));
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 8, 8));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 12, 12));
+        formPanel.setBackground(Theme.DARK_SURFACE);
+        formPanel.setBorder(new CompoundBorder(
+                new LineBorder(Theme.DARK_SURFACE_LIGHT, 1),
+                new EmptyBorder(16, 16, 16, 16)
+        ));
 
-        formPanel.add(new JLabel("Student ID:"));
+        JLabel lbl1 = new JLabel("Student ID:");
+        lbl1.setForeground(Theme.DARK_TEXT);
+        lbl1.setFont(lbl1.getFont().deriveFont(Font.BOLD, 11f));
+        formPanel.add(lbl1);
         txtStudentId = new JTextField();
+        txtStudentId.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtStudentId);
         formPanel.add(txtStudentId);
 
-        formPanel.add(new JLabel("Course ID:"));
+        JLabel lbl2 = new JLabel("Course ID:");
+        lbl2.setForeground(Theme.DARK_TEXT);
+        lbl2.setFont(lbl2.getFont().deriveFont(Font.BOLD, 11f));
+        formPanel.add(lbl2);
         txtCourseId = new JTextField();
+        txtCourseId.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtCourseId);
         formPanel.add(txtCourseId);
 
-        formPanel.add(new JLabel("Semester:"));
+        JLabel lbl3 = new JLabel("Semester:");
+        lbl3.setForeground(Theme.DARK_TEXT);
+        lbl3.setFont(lbl3.getFont().deriveFont(Font.BOLD, 11f));
+        formPanel.add(lbl3);
         txtSemester = new JTextField();
+        txtSemester.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtSemester);
         formPanel.add(txtSemester);
 
-        formPanel.add(new JLabel("School Year:"));
+        JLabel lbl4 = new JLabel("School Year:");
+        lbl4.setForeground(Theme.DARK_TEXT);
+        lbl4.setFont(lbl4.getFont().deriveFont(Font.BOLD, 11f));
+        formPanel.add(lbl4);
         txtSchoolYear = new JTextField();
+        txtSchoolYear.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtSchoolYear);
         formPanel.add(txtSchoolYear);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonPanel.setOpaque(false);
 
         JButton btnEnroll = new JButton("Enroll");
+        UIEffects.styleButton(btnEnroll);
         btnEnroll.addActionListener(e -> enrollStudent());
         buttonPanel.add(btnEnroll);
 
         JButton btnDelete = new JButton("Delete");
+        UIEffects.styleButton(btnDelete);
         btnDelete.addActionListener(e -> deleteEnrollment());
         buttonPanel.add(btnDelete);
 
@@ -70,7 +105,26 @@ public class EnrollmentForm extends JPanel {
                 new Object[]{"ID", "Student ID", "Course ID", "Semester", "Year"}, 0
         );
         table = new JTable(tableModel);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setRowHeight(32);
+        table.setShowGrid(false);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setBackground(Theme.DARK_SURFACE);
+        table.setForeground(Theme.DARK_TEXT);
+        table.setSelectionBackground(Theme.ACCENT_BLUE);
+        table.setSelectionForeground(Color.WHITE);
+        table.setGridColor(Theme.DARK_SURFACE_LIGHT);
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Theme.DARK_SURFACE_LIGHT);
+        header.setForeground(Theme.DARK_TEXT);
+        header.setFont(header.getFont().deriveFont(Font.BOLD, 11f));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBackground(Theme.DARK_BG);
+        scrollPane.getViewport().setBackground(Theme.DARK_SURFACE);
+        scrollPane.setBorder(new LineBorder(Theme.DARK_SURFACE_LIGHT, 1));
+
+        add(scrollPane, BorderLayout.CENTER);
 
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -84,7 +138,6 @@ public class EnrollmentForm extends JPanel {
                 }
             }
         });
-
     }
 
     private void loadEnrollments() {

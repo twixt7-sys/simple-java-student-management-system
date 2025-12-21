@@ -3,215 +3,309 @@ package src.ui;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import src.exceptions.InvalidInputException;
+import javax.swing.table.JTableHeader;
+
 import src.models.Student;
 import src.services.StudentService;
+import src.ui.components.Theme;
+import src.ui.components.UIEffects;
 
-// Swing form for adding and managing student records.
 public class StudentForm extends JPanel {
 
     private JTable table;
-    private DefaultTableModel tableModel;
-    private int selectedStudentId = -1;
+    private DefaultTableModel model;
+    private int selectedId = -1;
 
-    private JTextField txtStudentNumber;
-    private JTextField txtFirstName;
-    private JTextField txtLastName;
+    private JTextField txtStudentNo;
+    private JTextField txtFirst;
+    private JTextField txtLast;
     private JTextField txtEmail;
     private JTextField txtProgram;
 
-    private final StudentService studentService;
+    private final StudentService service = new StudentService();
 
     public StudentForm() {
-        studentService = new StudentService();
-        initialize();
-    }
-
-    private void initialize() {
-        setLayout(new BorderLayout(10, 10));
-
-        // container for form + buttons
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        // form grid
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 8, 8));
-
-        JLabel lblStudentNumber = new JLabel("Student Number:");
-        lblStudentNumber.setHorizontalAlignment(SwingConstants.LEFT);
-        formPanel.add(lblStudentNumber);
-        txtStudentNumber = new JTextField();
-        formPanel.add(txtStudentNumber);
-
-        JLabel lblFirstName = new JLabel("First Name:");
-        lblFirstName.setHorizontalAlignment(SwingConstants.LEFT);
-        formPanel.add(lblFirstName);
-        txtFirstName = new JTextField();
-        formPanel.add(txtFirstName);
-
-        JLabel lblLastName = new JLabel("Last Name:");
-        lblLastName.setHorizontalAlignment(SwingConstants.LEFT);
-        formPanel.add(lblLastName);
-        txtLastName = new JTextField();
-        formPanel.add(txtLastName);
-
-        JLabel lblEmail = new JLabel("Email:");
-        lblEmail.setHorizontalAlignment(SwingConstants.LEFT);
-        formPanel.add(lblEmail);
-        txtEmail = new JTextField();
-        formPanel.add(txtEmail);
-
-        JLabel lblProgram = new JLabel("Program:");
-        lblProgram.setHorizontalAlignment(SwingConstants.LEFT);
-        formPanel.add(lblProgram);
-        txtProgram = new JTextField();
-        formPanel.add(txtProgram);
-
-        // button grid
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-
-        JButton btnSave = new JButton("Save");
-        btnSave.addActionListener(e -> saveStudent());
-        buttonPanel.add(btnSave);
-
-        JButton btnUpdate = new JButton("Update");
-        btnUpdate.addActionListener(e -> updateStudent());
-        buttonPanel.add(btnUpdate);
-
-        JButton btnDelete = new JButton("Delete");
-        btnDelete.addActionListener(e -> deleteStudent());
-        buttonPanel.add(btnDelete);
-
-        topPanel.add(formPanel);
-        topPanel.add(buttonPanel);
-
-        add(topPanel, BorderLayout.NORTH);
-
-        // table
-        tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Student No", "First Name", "Last Name", "Email", "Program"}, 0
-        );
-        table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-
-        add(scrollPane, BorderLayout.CENTER);
-
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int row = table.getSelectedRow();
-                if (row >= 0) {
-                    selectedStudentId = (int) tableModel.getValueAt(row, 0);
-                    txtStudentNumber.setText(tableModel.getValueAt(row, 1).toString());
-                    txtFirstName.setText(tableModel.getValueAt(row, 2).toString());
-                    txtLastName.setText(tableModel.getValueAt(row, 3).toString());
-                    txtEmail.setText(tableModel.getValueAt(row, 4).toString());
-                    txtProgram.setText(tableModel.getValueAt(row, 5).toString());
-                }
-            }
-        });
-
-        loadStudents();
-    }
-
-    private void loadStudents() {
-        tableModel.setRowCount(0);
-        List<Student> students = studentService.getAllStudents();
-
-        for (Student s : students) {
-            tableModel.addRow(new Object[]{
-                s.getId(),
-                s.getStudentNumber(),
-                s.getFirstName(),
-                s.getLastName(),
-                s.getEmail(),
-                s.getProgram()
-            });
-        }
-    }
-
-    private void saveStudent() {
         try {
-            Student student = new Student();
-            student.setStudentNumber(txtStudentNumber.getText());
-            student.setFirstName(txtFirstName.getText());
-            student.setLastName(txtLastName.getText());
-            student.setEmail(txtEmail.getText());
-            student.setProgram(txtProgram.getText());
+            setLayout(new BorderLayout(20, 20));
+            setBackground(Theme.DARK_BG);
+            setBorder(new EmptyBorder(20, 20, 20, 20));
 
-            studentService.createStudent(student);
+            add(buildForm(), BorderLayout.NORTH);
+            add(buildTable(), BorderLayout.CENTER);
 
-            JOptionPane.showMessageDialog(this,
-                    "Student saved successfully");
-
-            loadStudents();
-
-            clearFields();
-
-        } catch (InvalidInputException ex) {
-            JOptionPane.showMessageDialog(this,
-                    ex.getMessage(),
-                    "Validation Error",
-                    JOptionPane.ERROR_MESSAGE);
+            load();
+        } catch (Exception ex) {
+            showError("Failed to initialize Student form", ex);
         }
     }
 
-    private void updateStudent() {
-        if (selectedStudentId == -1) {
+    private JPanel buildForm() {
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(Theme.DARK_SURFACE);
+        card.setBorder(new CompoundBorder(
+                new LineBorder(Theme.DARK_SURFACE_LIGHT, 1),
+                new EmptyBorder(20, 20, 20, 20)
+        ));
+
+        try {
+            GridBagConstraints g = new GridBagConstraints();
+            g.insets = new Insets(8, 8, 8, 8);
+            g.fill = GridBagConstraints.HORIZONTAL;
+
+            g.gridx = 0;
+            g.gridy = 0;
+            JLabel lbl1 = new JLabel("Student Number");
+            lbl1.setForeground(Theme.DARK_TEXT);
+            lbl1.setFont(lbl1.getFont().deriveFont(Font.BOLD, 11f));
+            card.add(lbl1, g);
+            g.gridx = 1;
+            txtStudentNo = new JTextField();
+            txtStudentNo.setPreferredSize(new Dimension(150, 32));
+            UIEffects.styleTextField(txtStudentNo);
+            card.add(txtStudentNo, g);
+
+            g.gridx = 0;
+            g.gridy++;
+            JLabel lbl2 = new JLabel("First Name");
+            lbl2.setForeground(Theme.DARK_TEXT);
+            lbl2.setFont(lbl2.getFont().deriveFont(Font.BOLD, 11f));
+            card.add(lbl2, g);
+            g.gridx = 1;
+            txtFirst = new JTextField();
+            txtFirst.setPreferredSize(new Dimension(150, 32));
+            UIEffects.styleTextField(txtFirst);
+            card.add(txtFirst, g);
+
+            g.gridx = 0;
+            g.gridy++;
+            JLabel lbl3 = new JLabel("Last Name");
+            lbl3.setForeground(Theme.DARK_TEXT);
+            lbl3.setFont(lbl3.getFont().deriveFont(Font.BOLD, 11f));
+            card.add(lbl3, g);
+            g.gridx = 1;
+            txtLast = new JTextField();
+            txtLast.setPreferredSize(new Dimension(150, 32));
+            UIEffects.styleTextField(txtLast);
+            card.add(txtLast, g);
+
+            g.gridx = 0;
+            g.gridy++;
+            JLabel lbl4 = new JLabel("Email");
+            lbl4.setForeground(Theme.DARK_TEXT);
+            lbl4.setFont(lbl4.getFont().deriveFont(Font.BOLD, 11f));
+            card.add(lbl4, g);
+            g.gridx = 1;
+            txtEmail = new JTextField();
+            txtEmail.setPreferredSize(new Dimension(150, 32));
+            UIEffects.styleTextField(txtEmail);
+            card.add(txtEmail, g);
+
+            g.gridx = 0;
+            g.gridy++;
+            JLabel lbl5 = new JLabel("Program");
+            lbl5.setForeground(Theme.DARK_TEXT);
+            lbl5.setFont(lbl5.getFont().deriveFont(Font.BOLD, 11f));
+            card.add(lbl5, g);
+            g.gridx = 1;
+            txtProgram = new JTextField();
+            txtProgram.setPreferredSize(new Dimension(150, 32));
+            UIEffects.styleTextField(txtProgram);
+            card.add(txtProgram, g);
+
+            g.gridx = 0;
+            g.gridy++;
+            g.gridwidth = 2;
+            g.anchor = GridBagConstraints.EAST;
+
+            JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+            actions.setOpaque(false);
+            JButton save = new JButton("Save");
+            JButton update = new JButton("Update");
+            JButton delete = new JButton("Delete");
+
+            UIEffects.styleButton(save);
+            UIEffects.styleButton(update);
+            UIEffects.styleButton(delete);
+
+            save.addActionListener(e -> save());
+            update.addActionListener(e -> update());
+            delete.addActionListener(e -> delete());
+
+            actions.add(delete);
+            actions.add(update);
+            actions.add(save);
+
+            card.add(actions, g);
+
+        } catch (Exception ex) {
+            showError("Failed to build form layout", ex);
+        }
+
+        return card;
+    }
+
+    private JScrollPane buildTable() {
+        try {
+            model = new DefaultTableModel(
+                    new Object[]{"ID", "Student No", "First", "Last", "Email", "Program"}, 0
+            );
+
+            table = new JTable(model);
+            table.setRowHeight(32);
+            table.setShowGrid(false);
+            table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            table.setBackground(Theme.DARK_SURFACE);
+            table.setForeground(Theme.DARK_TEXT);
+            table.setSelectionBackground(Theme.ACCENT_BLUE);
+            table.setSelectionForeground(Color.WHITE);
+            table.setGridColor(Theme.DARK_SURFACE_LIGHT);
+
+            JTableHeader header = table.getTableHeader();
+            header.setBackground(Theme.DARK_SURFACE_LIGHT);
+            header.setForeground(Theme.DARK_TEXT);
+            header.setFont(header.getFont().deriveFont(Font.BOLD, 11f));
+
+            table.getSelectionModel().addListSelectionListener(e -> {
+                try {
+                    int r = table.getSelectedRow();
+                    if (r >= 0) {
+                        selectedId = (int) model.getValueAt(r, 0);
+                        txtStudentNo.setText(model.getValueAt(r, 1).toString());
+                        txtFirst.setText(model.getValueAt(r, 2).toString());
+                        txtLast.setText(model.getValueAt(r, 3).toString());
+                        txtEmail.setText(model.getValueAt(r, 4).toString());
+                        txtProgram.setText(model.getValueAt(r, 5).toString());
+                    }
+                } catch (Exception ex) {
+                    showError("Failed to load selected student", ex);
+                }
+            });
+
+            JScrollPane sp = new JScrollPane(table);
+            sp.setBackground(Theme.DARK_BG);
+            sp.getViewport().setBackground(Theme.DARK_SURFACE);
+            sp.setBorder(new LineBorder(Theme.DARK_SURFACE_LIGHT, 1));
+            return sp;
+
+        } catch (Exception ex) {
+            showError("Failed to initialize table", ex);
+            return new JScrollPane();
+        }
+    }
+
+    private void load() {
+        try {
+            model.setRowCount(0);
+            List<Student> students = service.getAllStudents();
+
+            for (Student s : students) {
+                model.addRow(new Object[]{
+                    s.getId(),
+                    s.getStudentNumber(),
+                    s.getFirstName(),
+                    s.getLastName(),
+                    s.getEmail(),
+                    s.getProgram()
+                });
+            }
+        } catch (Exception ex) {
+            showError("Failed to load students", ex);
+        }
+    }
+
+    private void save() {
+        try {
+            Student s = new Student();
+            s.setStudentNumber(txtStudentNo.getText());
+            s.setFirstName(txtFirst.getText());
+            s.setLastName(txtLast.getText());
+            s.setEmail(txtEmail.getText());
+            s.setProgram(txtProgram.getText());
+
+            service.createStudent(s);
+            load();
+            clear();
+
+            JOptionPane.showMessageDialog(this, "Student saved successfully");
+        } catch (Exception ex) {
+            showError("Failed to save student", ex);
+        }
+    }
+
+    private void update() {
+        if (selectedId == -1) {
             JOptionPane.showMessageDialog(this, "Select a student first");
             return;
         }
 
         try {
-            Student student = new Student();
-            student.setId(selectedStudentId);
-            student.setStudentNumber(txtStudentNumber.getText());
-            student.setFirstName(txtFirstName.getText());
-            student.setLastName(txtLastName.getText());
-            student.setEmail(txtEmail.getText());
-            student.setProgram(txtProgram.getText());
+            Student s = new Student();
+            s.setId(selectedId);
+            s.setStudentNumber(txtStudentNo.getText());
+            s.setFirstName(txtFirst.getText());
+            s.setLastName(txtLast.getText());
+            s.setEmail(txtEmail.getText());
+            s.setProgram(txtProgram.getText());
 
-            studentService.updateStudent(student);
-            loadStudents();
-            clearFields();
+            service.updateStudent(s);
+            load();
+            clear();
 
             JOptionPane.showMessageDialog(this, "Student updated");
-            loadStudents();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage());
+            showError("Failed to update student", ex);
         }
     }
 
-    private void deleteStudent() {
-        if (selectedStudentId == -1) {
+    private void delete() {
+        if (selectedId == -1) {
             JOptionPane.showMessageDialog(this, "Select a student first");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Are you sure you want to delete this student?",
-                "Confirm",
-                JOptionPane.YES_NO_OPTION
-        );
+        try {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Delete this student?",
+                    "Confirm",
+                    JOptionPane.YES_NO_OPTION
+            );
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            studentService.deleteStudent(selectedStudentId);
-            loadStudents();
-            clearFields();
-            JOptionPane.showMessageDialog(this, "Student deleted");
+            if (confirm == JOptionPane.YES_OPTION) {
+                service.deleteStudent(selectedId);
+                load();
+                clear();
+                JOptionPane.showMessageDialog(this, "Student deleted");
+            }
+        } catch (Exception ex) {
+            showError("Failed to delete student", ex);
         }
-
-        loadStudents();
     }
 
-    private void clearFields() {
-        txtStudentNumber.setText("");
-        txtFirstName.setText("");
-        txtLastName.setText("");
-        txtEmail.setText("");
-        txtProgram.setText("");
+    private void clear() {
+        try {
+            txtStudentNo.setText("");
+            txtFirst.setText("");
+            txtLast.setText("");
+            txtEmail.setText("");
+            txtProgram.setText("");
+            selectedId = -1;
+        } catch (Exception ex) {
+            showError("Failed to clear form", ex);
+        }
+    }
+
+    private void showError(String message, Exception ex) {
+        JOptionPane.showMessageDialog(
+                this,
+                message + "\n" + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+        ex.printStackTrace();
     }
 }

@@ -3,12 +3,17 @@ package src.ui;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
 import src.exceptions.InvalidInputException;
 import src.models.Course;
 import src.services.CourseService;
+import src.ui.components.FormCard;
+import src.ui.components.Theme;
+import src.ui.components.UIEffects;
 
-// Swing form for adding and managing course records.
 public class CourseForm extends JPanel {
 
     private JTable table;
@@ -23,65 +28,103 @@ public class CourseForm extends JPanel {
 
     public CourseForm() {
         courseService = new CourseService();
+        setLayout(new BorderLayout(16, 16));
+        setBackground(Theme.DARK_BG);
         initialize();
     }
 
     private void initialize() {
-        setLayout(new BorderLayout(10, 10));
+        FormCard card = new FormCard();
+        card.setHeader("Courses");
 
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        JPanel form = new JPanel(new GridLayout(3, 2, 10, 10));
+        form.setOpaque(false);
+        form.setBorder(new javax.swing.border.EmptyBorder(6, 6, 6, 6));
 
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 8, 8));
-
-        formPanel.add(new JLabel("Course Code:"));
+        JLabel lbl1 = new JLabel("Course Code");
+        lbl1.setForeground(Theme.DARK_TEXT);
+        lbl1.setFont(lbl1.getFont().deriveFont(Font.BOLD, 11f));
+        form.add(lbl1);
         txtCourseCode = new JTextField();
-        formPanel.add(txtCourseCode);
+        txtCourseCode.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtCourseCode);
+        form.add(txtCourseCode);
 
-        formPanel.add(new JLabel("Course Name:"));
+        JLabel lbl2 = new JLabel("Course Name");
+        lbl2.setForeground(Theme.DARK_TEXT);
+        lbl2.setFont(lbl2.getFont().deriveFont(Font.BOLD, 11f));
+        form.add(lbl2);
         txtCourseName = new JTextField();
-        formPanel.add(txtCourseName);
+        txtCourseName.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtCourseName);
+        form.add(txtCourseName);
 
-        formPanel.add(new JLabel("Units:"));
+        JLabel lbl3 = new JLabel("Units");
+        lbl3.setForeground(Theme.DARK_TEXT);
+        lbl3.setFont(lbl3.getFont().deriveFont(Font.BOLD, 11f));
+        form.add(lbl3);
         txtUnits = new JTextField();
-        formPanel.add(txtUnits);
+        txtUnits.setPreferredSize(new Dimension(Integer.MAX_VALUE, 32));
+        UIEffects.styleTextField(txtUnits);
+        form.add(txtUnits);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        actions.setOpaque(false);
 
         JButton btnSave = new JButton("Save");
-        btnSave.addActionListener(e -> saveCourse());
-        buttonPanel.add(btnSave);
-
         JButton btnUpdate = new JButton("Update");
-        btnUpdate.addActionListener(e -> updateCourse());
-        buttonPanel.add(btnUpdate);
-
         JButton btnDelete = new JButton("Delete");
+
+        UIEffects.styleButton(btnSave);
+        UIEffects.styleButton(btnUpdate);
+        UIEffects.styleButton(btnDelete);
+
+        btnSave.addActionListener(e -> saveCourse());
+        btnUpdate.addActionListener(e -> updateCourse());
         btnDelete.addActionListener(e -> deleteCourse());
-        buttonPanel.add(btnDelete);
 
-        topPanel.add(formPanel);
-        topPanel.add(buttonPanel);
+        actions.add(btnSave);
+        actions.add(btnUpdate);
+        actions.add(btnDelete);
 
-        add(topPanel, BorderLayout.NORTH);
+        card.add(form, BorderLayout.CENTER);
+        card.add(actions, BorderLayout.SOUTH);
+
+        add(card, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(
                 new Object[]{"ID", "Code", "Name", "Units"}, 0
         );
+
         table = new JTable(tableModel);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setRowHeight(32);
+        table.setShowGrid(false);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setBackground(Theme.DARK_SURFACE);
+        table.setForeground(Theme.DARK_TEXT);
+        table.setSelectionBackground(Theme.ACCENT_BLUE);
+        table.setSelectionForeground(Color.WHITE);
+        table.setGridColor(Theme.DARK_SURFACE_LIGHT);
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Theme.DARK_SURFACE_LIGHT);
+        header.setForeground(Theme.DARK_TEXT);
+        header.setFont(header.getFont().deriveFont(Font.BOLD, 11f));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBackground(Theme.DARK_BG);
+        scrollPane.getViewport().setBackground(Theme.DARK_SURFACE);
+        scrollPane.setBorder(new LineBorder(Theme.DARK_SURFACE_LIGHT, 1));
+
+        add(scrollPane, BorderLayout.CENTER);
 
         table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
+            if (!e.getValueIsAdjusting() && table.getSelectedRow() >= 0) {
                 int row = table.getSelectedRow();
-                if (row >= 0) {
-                    selectedCourseId = (int) tableModel.getValueAt(row, 0);
-                    txtCourseCode.setText(tableModel.getValueAt(row, 1).toString());
-                    txtCourseName.setText(tableModel.getValueAt(row, 2).toString());
-                    txtUnits.setText(tableModel.getValueAt(row, 3).toString());
-                }
+                selectedCourseId = (int) tableModel.getValueAt(row, 0);
+                txtCourseCode.setText(tableModel.getValueAt(row, 1).toString());
+                txtCourseName.setText(tableModel.getValueAt(row, 2).toString());
+                txtUnits.setText(tableModel.getValueAt(row, 3).toString());
             }
         });
 
@@ -113,18 +156,14 @@ public class CourseForm extends JPanel {
             loadCourses();
             clearFields();
 
-            JOptionPane.showMessageDialog(this, "Course saved successfully");
-
-        } catch (InvalidInputException ex) {
+            JOptionPane.showMessageDialog(this, "Course saved");
+        } catch (InvalidInputException | NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Units must be a number");
         }
     }
 
     private void updateCourse() {
         if (selectedCourseId == -1) {
-            JOptionPane.showMessageDialog(this, "Select a course first");
             return;
         }
 
@@ -138,9 +177,6 @@ public class CourseForm extends JPanel {
             courseService.updateCourse(course);
             loadCourses();
             clearFields();
-
-            JOptionPane.showMessageDialog(this, "Course updated");
-
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
         }
@@ -148,24 +184,12 @@ public class CourseForm extends JPanel {
 
     private void deleteCourse() {
         if (selectedCourseId == -1) {
-            JOptionPane.showMessageDialog(this, "Select a course first");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Delete this course?",
-                "Confirm",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            courseService.deleteCourse(selectedCourseId);
-            loadCourses();
-            clearFields();
-            JOptionPane.showMessageDialog(this, "Course deleted");
-        }
+        courseService.deleteCourse(selectedCourseId);
         loadCourses();
+        clearFields();
     }
 
     private void clearFields() {
