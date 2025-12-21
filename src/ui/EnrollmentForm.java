@@ -25,7 +25,8 @@ public class EnrollmentForm extends JPanel {
 
     private RoundedTextField txtStudentId;
     private RoundedTextField txtCourseId;
-    private RoundedTextField txtGrade;
+    private RoundedTextField txtSemester;
+    private RoundedTextField txtSchoolYear;
     private JLabel statusLabel;
 
     private final EnrollmentService enrollmentService;
@@ -84,15 +85,27 @@ public class EnrollmentForm extends JPanel {
 
         g.gridx = 0;
         g.gridy++;
-        JLabel lbl3 = new JLabel("Grade (optional)");
+        JLabel lbl3 = new JLabel("Semester");
         lbl3.setForeground(Theme.DARK_TEXT);
         lbl3.setFont(new Font("Segoe UI", Font.BOLD, 11));
         card.add(lbl3, g);
 
         g.gridx = 1;
-        txtGrade = new RoundedTextField();
-        txtGrade.setPreferredSize(new Dimension(200, 38));
-        card.add(txtGrade, g);
+        txtSemester = new RoundedTextField();
+        txtSemester.setPreferredSize(new Dimension(200, 38));
+        card.add(txtSemester, g);
+
+        g.gridx = 0;
+        g.gridy++;
+        JLabel lbl4 = new JLabel("School Year");
+        lbl4.setForeground(Theme.DARK_TEXT);
+        lbl4.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        card.add(lbl4, g);
+
+        g.gridx = 1;
+        txtSchoolYear = new RoundedTextField();
+        txtSchoolYear.setPreferredSize(new Dimension(200, 38));
+        card.add(txtSchoolYear, g);
 
         g.gridx = 0;
         g.gridy++;
@@ -144,7 +157,7 @@ public class EnrollmentForm extends JPanel {
         add(card, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(
-                new Object[]{"ID", "Student ID", "Course ID", "Grade"}, 0
+                new Object[]{"ID", "Student ID", "Course ID", "Semester", "School Year"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -177,10 +190,8 @@ public class EnrollmentForm extends JPanel {
                 selectedEnrollmentId = (int) tableModel.getValueAt(row, 0);
                 txtStudentId.setText(tableModel.getValueAt(row, 1).toString());
                 txtCourseId.setText(tableModel.getValueAt(row, 2).toString());
-                txtGrade.setText(
-                        tableModel.getValueAt(row, 3).toString().equals("-") ? ""
-                        : tableModel.getValueAt(row, 3).toString()
-                );
+                txtSemester.setText(tableModel.getValueAt(row, 3).toString());
+                txtSchoolYear.setText(tableModel.getValueAt(row, 4).toString());
                 setStatus("Selected enrollment #" + selectedEnrollmentId, Theme.ACCENT_BLUE);
             }
         });
@@ -195,7 +206,8 @@ public class EnrollmentForm extends JPanel {
                 e.getId(),
                 e.getStudent().getId(),
                 e.getCourse().getId(),
-                e.getGrade() != null ? e.getGrade() : "-"
+                e.getSemester() != null ? e.getSemester() : "-",
+                e.getSchoolYear() != null ? e.getSchoolYear() : "-"
             });
         }
     }
@@ -215,7 +227,8 @@ public class EnrollmentForm extends JPanel {
             Enrollment enrollment = new Enrollment();
             enrollment.setStudent(student);
             enrollment.setCourse(course);
-            enrollment.setGrade(txtGrade.getText().isBlank() ? null : txtGrade.getText());
+            enrollment.setSemester(txtSemester.getText());
+            enrollment.setSchoolYear(txtSchoolYear.getText());
 
             enrollmentService.enrollStudent(enrollment);
 
@@ -254,7 +267,8 @@ public class EnrollmentForm extends JPanel {
     private void clearFields() {
         txtStudentId.setText("");
         txtCourseId.setText("");
-        txtGrade.setText("");
+        txtSemester.setText("");
+        txtSchoolYear.setText("");
         selectedEnrollmentId = -1;
         statusLabel.setText("");
         table.clearSelection();
@@ -267,6 +281,14 @@ public class EnrollmentForm extends JPanel {
         }
         if (txtCourseId.getText().isBlank()) {
             setStatus("Course ID is required", Theme.ERROR_RED);
+            return false;
+        }
+        if (txtSemester.getText().isBlank()) {
+            setStatus("Semester is required", Theme.ERROR_RED);
+            return false;
+        }
+        if (txtSchoolYear.getText().isBlank()) {
+            setStatus("School year is required", Theme.ERROR_RED);
             return false;
         }
         return true;

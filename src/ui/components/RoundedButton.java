@@ -10,9 +10,9 @@ public class RoundedButton extends JButton {
 
     private static final int ARC = 12;
 
-    private final Color defaultColor;
-    private final Color hoverColor;
-    private final Color pressColor;
+    private Color defaultColor;
+    private Color hoverColor;
+    private Color pressColor;
 
     private Color currentColor;
 
@@ -56,6 +56,21 @@ public class RoundedButton extends JButton {
                 repaint();
             }
         });
+    }
+
+    // Allow runtime update of the button color scheme
+    public void setColors(Color defaultColor, Color hoverColor, Color pressColor) {
+        this.defaultColor = defaultColor;
+        this.hoverColor = hoverColor;
+        this.pressColor = pressColor;
+        this.currentColor = this.defaultColor;
+        repaint();
+    }
+
+    // Reset current displayed color to the default (useful after changing styles)
+    public void setDefaultAsCurrent() {
+        this.currentColor = this.defaultColor;
+        repaint();
     }
 
     @Override

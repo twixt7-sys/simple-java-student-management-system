@@ -71,9 +71,9 @@ public class MainFrame extends JFrame {
         navBar.setBackground(Theme.DARK_BG);
         navBar.setBorder(new EmptyBorder(0, 20, 0, 20));
 
-        RoundedButton btnStudents = createNavButton("👥 Students", true);
-        RoundedButton btnCourses = createNavButton("📚 Courses", false);
-        RoundedButton btnEnrollments = createNavButton("📋 Enrollments", false);
+        RoundedButton btnStudents = createNavButton("Students", false);
+        RoundedButton btnCourses = createNavButton("Courses", false);
+        RoundedButton btnEnrollments = createNavButton("Enrollments", false);
         btnStudents.addActionListener(e -> {
             formsLayout.show(formsPanel, "STUDENT");
             titleLabel.setText("Students");
@@ -129,9 +129,16 @@ public class MainFrame extends JFrame {
     }
 
     private void updateNavButtons(RoundedButton active, RoundedButton... inactive) {
-        // Update styling for active/inactive buttons
+        // Style active button
+        active.setColors(Theme.ACCENT_BLUE, Theme.ACCENT_BLUE_HOVER, Theme.ACCENT_BLUE_DARK);
+        active.setForeground(Color.WHITE);
+        active.setDefaultAsCurrent();
+
+        // Style inactive buttons
         for (RoundedButton btn : inactive) {
-            // Reset to inactive state
+            btn.setColors(Theme.DARK_SURFACE_LIGHT, Theme.DARK_SURFACE, new Color(50, 50, 50));
+            btn.setForeground(Color.WHITE);
+            btn.setDefaultAsCurrent();
         }
     }
 
