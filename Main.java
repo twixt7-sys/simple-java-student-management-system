@@ -1,9 +1,8 @@
 
 import java.awt.Color;
 import java.awt.Font;
-import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
-
+import javax.swing.UIManager;
 import src.ui.MainFrame;
 import src.utils.DemoDataInitializer;
 

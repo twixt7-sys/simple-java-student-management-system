@@ -201,6 +201,33 @@ Text Secondary:    #B4B4B4
 - ✅ Learning Swing and Java desktop applications
 - ✅ Starting point for real-world applications
 
+## 🔧 Troubleshooting foreign-key INSERT errors (your MySQL #1452 case)
+
+Problem observed:
+- MySQL error #1452: "Cannot add or update a child row: a foreign key constraint fails ... enrollments ... FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`)".
+- This means one or more student_id values you are inserting into `enrollments` do not exist in the `students` table (or the referenced course_id does not exist in `courses`).
+
+Quick checks (run these in your MySQL client):
+- Verify students exist:
+  SELECT * FROM students WHERE student_id IN (1,2);
+- Verify courses exist:
+  SELECT * FROM courses WHERE course_id IN (1,2);
+
+Safe fixes:
+1. Insert or ensure the referenced students/courses exist before inserting enrollments.
+2. Use transactions so any failure rolls back.
+3. Don't disable foreign key checks in production; only use that as last resort for migration scripts.
+
+Included helpers:
+- sql/fix-enrollments.sql — a small transactional script that ensures demo students/courses exist and inserts the enrollments.
+- src/db/Database.java — centralized connection handling with clear error logging.
+- src/utils/DemoDataInitializer.java — demo initializer that checks existence, uses transactions, and reports friendly errors.
+
+If you still get #1452, run:
+- SHOW CREATE TABLE enrollments;
+- SELECT * FROM students WHERE student_id = <id>;
+These will show the FK definition and which referenced rows are missing.
+
 ---
 
 **This project now has the "wow factor" your professor is looking for! 🌟**
